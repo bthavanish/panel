@@ -85,7 +85,7 @@
                 <% grp.entries.forEach(entry => { %>
                   <li class="nav-item">
                     <a href="<%= entry.url %>" class="transition nav-link mt-1 px-4 mx-4 group flex gap-x-3 py-1.5 rounded-xl text-sm leading-6 font-normal" style="color:var(--theme-nav-text);" data-server-control-link>
-                      <%= entry.item.icon.replace(/class="[^"]*"/, 'class="w-5 h-5 mt-0.5 shrink-0"') %>
+                      <%- entry.item.icon.replace(/class="[^"]*"/, 'class="w-5 h-5 mt-0.5 shrink-0"') %>
                       <span><%= entry.item.label %></span>
                     </a>
                   </li>
@@ -94,7 +94,7 @@
             <% } %>
             <% } %>
 
-            <% if (user != null && user.isAdmin === true) { %>
+            <% if (user != null && user.isAdmin === true && !(typeof req !== 'undefined' && req && (req.path || req.originalUrl || '').startsWith('/server/'))) { %>
               <p class="pl-8 text-xs font-medium pt-6 pb-2" style="color:var(--theme-nav-text);"><span><%= req.translations.navAdminPanel || 'Admin Panel' %></span></p>
 
               <p class="pl-8 text-xs font-medium pt-4 pb-1.5 uppercase tracking-wide" style="color:var(--theme-text-muted);"><span>Core</span></p>
@@ -317,15 +317,37 @@
     });
   }
 
+  // If the active nav link sits below the sidebar's scrollable fold, bring
+  // it fully into view on page load. If it is the last button (nothing
+  // below it), the scroll clamps to the bottom of the list.
+  function showActiveNavInView() {
+    var activeLink = document.querySelector('#pc-sidebar .nav-link.active, #pc-sidebar [data-server-control-link].active');
+    if (!activeLink) return;
+    var container = activeLink.closest('nav');
+    if (!container) return;
+    var pad = 16;
+    var cTop = container.getBoundingClientRect().top;
+    var cBottom = container.getBoundingClientRect().bottom;
+    var r = activeLink.getBoundingClientRect();
+    if (r.bottom + pad > cBottom) {
+      container.scrollTop = container.scrollTop + (r.bottom + pad - cBottom);
+    } else if (r.top - pad < cTop) {
+      container.scrollTop = container.scrollTop - (cTop - (r.top - pad));
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
+    // Show sidebar first — rects are all zeros while display:none, so the
+    // scroll check below would never fire.
+    document.getElementById('pc-sidebar').style.display = '';
     markSpecialLinks(window.location.pathname);
     markActiveNav(window.location.pathname);
-    // Show sidebar
-    document.getElementById('pc-sidebar').style.display = '';
+    showActiveNavInView();
   });
   document.addEventListener('al:navigated', function () {
     markSpecialLinks(window.location.pathname);
     markActiveNav(window.location.pathname);
+    showActiveNavInView();
   });
 })();
 </script>

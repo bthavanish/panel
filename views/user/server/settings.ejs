@@ -12,7 +12,7 @@
         { label: 'Settings' }
       ] }) %>
       <!-- Page Header: title + meta left -->
-      <div class="px-4 sm:px-8 pt-4">
+      <div class="px-4 sm:px-8 pt-4 pb-2 sm:pb-6">
         <div class="flex flex-wrap items-start justify-between gap-4">
           <div class="flex-1 min-w-0">
             <%- include('../../components/serverHeader') %>
@@ -24,7 +24,7 @@
       <%- include('../../components/installHeader') %>
       <%- include('../../components/serverTemplate') %>
 
-      <div class="al-page-body space-y-5">
+      <div class="al-page-body space-y-5 mt-8">
 
         <div class="al-card p-5">
           <h2 class="text-lg font-semibold mb-1" style="color:var(--theme-text-strong)"><%= req.translations.serverSettings || 'Server Settings' %></h2>
